@@ -1,5 +1,5 @@
 """
-Django settings for vigil project.
+Django settings for basilisk project.
 """
 
 from datetime import timedelta
@@ -41,7 +41,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'vigil.urls'
+ROOT_URLCONF = 'basilisk.urls'
 
 TEMPLATES = [
     {
@@ -59,8 +59,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'vigil.wsgi.application'
-ASGI_APPLICATION = 'vigil.asgi.application'
+WSGI_APPLICATION = 'basilisk.wsgi.application'
+ASGI_APPLICATION = 'basilisk.asgi.application'
 
 DATABASES = {
     'default': {

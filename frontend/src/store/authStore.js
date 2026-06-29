@@ -19,7 +19,7 @@ export const useAuthStore = create(
           localStorage.setItem('accessToken', access)
           localStorage.setItem('refreshToken', refresh)
           
-          const userResponse = await axios.get(`${API_URL}/auth/profile/`, {
+          const userResponse = await axios.get(`${API_URL}/users/me/`, {
             headers: { Authorization: `Bearer ${access}` }
           })
           
@@ -39,7 +39,7 @@ export const useAuthStore = create(
       initialize: () => {
       const accessToken = localStorage.getItem('accessToken')
       if (accessToken) {
-        axios.get(`${API_URL}/auth/profile/`, {
+        axios.get(`${API_URL}/users/me/`, {
           headers: { Authorization: `Bearer ${accessToken}` }
         }).then(response => {
           set({ user: response.data, accessToken, initialized: true })

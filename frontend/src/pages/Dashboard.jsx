@@ -19,7 +19,7 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">VIGIL</h1>
+              <h1 className="text-xl font-bold text-gray-900">BASILISK</h1>
               <div className="ml-8 flex space-x-4">
                 {navItems.map((item) => {
                   if (item.roles) {
@@ -64,7 +64,7 @@ export default function Dashboard() {
 
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to VIGIL</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to BASILISK</h2>
           <p className="text-gray-600">College Attendance & Timetable Management Platform</p>
         </div>
 

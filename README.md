@@ -1,6 +1,6 @@
-# VIGIL - College Attendance & Timetable Management Platform
+# BASILISK - College Attendance & Timetable Management Platform
 
-At VIGIL, we combine advanced technology to provide efficient attendance marking, ensuring a safe and accountable environment.
+At BASILISK, we combine advanced technology to provide efficient attendance marking, ensuring a safe and accountable environment.
 
 ## Tech Stack
 
@@ -12,9 +12,9 @@ At VIGIL, we combine advanced technology to provide efficient attendance marking
 ## Project Structure
 
 ```
-vigil/
+basilisk/
 ├── backend/                 # Django REST API
-│   ├── vigil/              # Project settings
+│   ├── basilisk/           # Project settings
 │   ├── apps/
 │   │   ├── users/          # Authentication, roles
 │   │   ├── students/       # Student, Class models
@@ -37,7 +37,7 @@ vigil/
 │   │   │   └── authStore.js     # Zustand + JWT
 │   │   └── App.jsx
 │   └── package.json
-└── .kilo/plans/
+└── /
 ```
 
 ## Setup

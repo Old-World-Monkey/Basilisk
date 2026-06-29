@@ -1,5 +1,5 @@
 """
-URL configuration for vigil project.
+URL configuration for basilisk project.
 """
 from django.contrib import admin
 from django.urls import path, include

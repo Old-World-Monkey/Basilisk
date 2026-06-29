@@ -34,7 +34,7 @@ export default function Login() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">VIGIL</h1>
+          <h1 className="text-2xl font-bold text-gray-900">BASILISK</h1>
           <p className="text-sm text-gray-600 mt-1">Attendance & Timetable Management</p>
         </div>
         
