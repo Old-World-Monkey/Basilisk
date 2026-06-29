@@ -102,8 +102,13 @@ npm run dev
 
 ## Login Credentials (Development)
 
-- **Username**: `admin`
-- **Password**: `admin123`
+| Role | Username | Password |
+|------|----------|----------|
+| Admin | `admin` | `admin123` |
+| Teacher | `teacher` | `teacher123` |
+| HOD | `hod` | `hod123` |
+
+Create more users via Django admin at `http://localhost:8000/admin` or API.
 
 ## Sprint 2 (Upcoming)
 
