@@ -7,7 +7,6 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-.kilo/
 node_modules
 dist
 dist-ssr
@@ -23,11 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# Python Cache
-__pycache__/
-*.pyc
-
-
-# Node modules (You will definitely need this next!)
-node_modules/
