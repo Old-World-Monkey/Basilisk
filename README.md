@@ -47,6 +47,7 @@ basilisk/
 ```bash
 cd backend
 pip install -r requirements.txt
+docker compose up -d
 python manage.py migrate
 python manage.py runserver
 ```
