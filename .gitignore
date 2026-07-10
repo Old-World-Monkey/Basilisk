@@ -31,3 +31,4 @@ __pycache__/
 
 # Node modules (You will definitely need this next!)
 node_modules/
+/CMS/backend/.venv
