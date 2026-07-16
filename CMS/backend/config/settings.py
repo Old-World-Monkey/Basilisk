@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
      'rest_framework',
      'corsheaders',
-     'auth',
+     'authenticater',
 ]
 
 MIDDLEWARE = [
@@ -131,3 +131,6 @@ CORS_ALLOWED_ORIGINS = [
 
 # Alternative for local development ONLY (Uncomment below if you want to allow ALL domains during testing)
 # CORS_ALLOW_ALL_ORIGINS = True
+
+# settings.py
+AUTH_USER_MODEL = 'authenticater.Users'
