@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
      'rest_framework',
+     "rest_framework_simplejwt",
      'corsheaders',
      'authenticater',
 ]
@@ -124,13 +125,19 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 # CORS configuration
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Vite local development port
-    "http://127.0.0.1:5173",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:5173",  # Vite local development port
+#     "http://127.0.0.1:5173",
+# ]
 
 # Alternative for local development ONLY (Uncomment below if you want to allow ALL domains during testing)
-# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True
 
 # settings.py
-AUTH_USER_MODEL = 'authenticater.Users'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+AUTH_USER_MODEL = 'users_app.Users'
