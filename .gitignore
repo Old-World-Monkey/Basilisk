@@ -31,4 +31,6 @@ __pycache__/
 
 # Node modules (You will definitely need this next!)
 node_modules/
+
+migrations/
 /CMS/backend/.venv

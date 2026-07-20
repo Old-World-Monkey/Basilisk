@@ -101,7 +101,22 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-]
+
+# CORS configuration
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:5173",  # Vite local development port
+#     "http://127.0.0.1:5173",
+# ]
+
+# Alternative for local development ONLY (Uncomment below if you want to allow ALL domains during testing)
+CORS_ALLOW_ALL_ORIGINS = True
+
+# settings.py
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+AUTH_USER_MODEL = 'users_app.Users'
+
