@@ -20,10 +20,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'corsheaders',
-    'users',
+     'rest_framework',
+     "rest_framework_simplejwt",
+     'corsheaders',
+     'users_app',
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'
