@@ -7,7 +7,7 @@ import TimetableView from './pages/TimetableView'
 import StudentsPage from './pages/StudentsPage'
 import ReportsPage from './pages/ReportsPage'
 import SettingsPage from './pages/SettingsPage'
-import ProtectedRoute from './components/ProtectedRoute'
+import ProtectedRoute, { RoleRoute } from './components/ProtectedRoute'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,7 +36,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Routes>
         <Route path="/login" element={!user ? <Login /> : <Navigate to="/" replace />} />
-        <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/" element={<RoleRoute allowedRoles={['ADMIN']}><Dashboard /></RoleRoute>} />
         <Route path="/timetable" element={<ProtectedRoute><TimetableView /></ProtectedRoute>} />
         <Route path="/students" element={<ProtectedRoute><StudentsPage /></ProtectedRoute>} />
         <Route path="/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
