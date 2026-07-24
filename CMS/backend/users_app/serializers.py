@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+from .models import Teacher, Class, Subject
+
 User = get_user_model()
 
 
@@ -50,7 +52,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
 
-        # Add custom claims
         token["role"] = user.role
         token["username"] = user.username
         token["email"] = user.email
@@ -68,3 +69,26 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         }
 
         return data
+
+
+class TeacherSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Teacher
+        fields = ["id", "name", "email", "subject"]
+
+
+class ClassSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Class
+        fields = ["id", "name", "section", "room"]
+
+
+class SubjectSerializer(serializers.ModelSerializer):
+    teacher = TeacherSerializer(read_only=True)
+    teacher_id = serializers.PrimaryKeyRelatedField(
+        queryset=Teacher.objects.all(), source="teacher", write_only=True
+    )
+
+    class Meta:
+        model = Subject
+        fields = ["id", "name", "code", "teacher", "teacher_id"]

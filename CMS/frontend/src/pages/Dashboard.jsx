@@ -1,10 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import axios from 'axios'
 import { PlusIcon, TrashIcon, CalendarIcon, UsersIcon, ChartBarIcon, ClipboardDocumentListIcon, CogIcon } from '@heroicons/react/24/outline'
 
+const API_URL = import.meta.env.VITE_API_URL || '/api'
+
 export default function Dashboard() {
-  const { user, logout } = useAuthStore()
+  const { user, logout, accessToken } = useAuthStore()
 
   const [teachers, setTeachers] = useState([])
   const [classes, setClasses] = useState([])
@@ -12,24 +15,131 @@ export default function Dashboard() {
 
   const [teacherForm, setTeacherForm] = useState({ name: '', email: '', subject: '' })
   const [classForm, setClassForm] = useState({ name: '', section: '', room: '' })
-  const [subjectForm, setSubjectForm] = useState({ name: '', code: '', teacher: '' })
+  const [subjectForm, setSubjectForm] = useState({ name: '', code: '', teacher_id: '' })
 
-  const addTeacher = () => {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${accessToken}`,
+  }
+
+  const fetchTeachers = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/users/teachers/`, { headers })
+      setTeachers(res.data)
+    } catch (err) {
+      console.error('Failed to fetch teachers', err)
+    }
+  }
+
+  const fetchClasses = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/users/classes/`, { headers })
+      setClasses(res.data)
+    } catch (err) {
+      console.error('Failed to fetch classes', err)
+    }
+  }
+
+  const fetchSubjects = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/users/subjects/`, { headers })
+      setSubjects(res.data)
+    } catch (err) {
+      console.error('Failed to fetch subjects', err)
+    }
+  }
+
+  useEffect(() => {
+    fetchTeachers()
+    fetchClasses()
+    fetchSubjects()
+  }, [])
+
+  const addTeacher = async () => {
     if (!teacherForm.name || !teacherForm.email) return
-    setTeachers([...teachers, { ...teacherForm, id: Date.now() }])
-    setTeacherForm({ name: '', email: '', subject: '' })
+    setLoading(true)
+    setError('')
+    try {
+      const res = await axios.post(`${API_URL}/users/teachers/`, teacherForm, { headers })
+      setTeachers([...teachers, res.data])
+      setTeacherForm({ name: '', email: '', subject: '' })
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to add teacher')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const addClass = () => {
+  const addClass = async () => {
     if (!classForm.name || !classForm.section) return
-    setClasses([...classes, { ...classForm, id: Date.now() }])
-    setClassForm({ name: '', section: '', room: '' })
+    setLoading(true)
+    setError('')
+    try {
+      const res = await axios.post(`${API_URL}/users/classes/`, classForm, { headers })
+      setClasses([...classes, res.data])
+      setClassForm({ name: '', section: '', room: '' })
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to add class')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const addSubject = () => {
-    if (!subjectForm.name || !subjectForm.code) return
-    setSubjects([...subjects, { ...subjectForm, id: Date.now() }])
-    setSubjectForm({ name: '', code: '', teacher: '' })
+  const addSubject = async () => {
+    if (!subjectForm.name || !subjectForm.code || !subjectForm.teacher_id) return
+    setLoading(true)
+    setError('')
+    try {
+      const res = await axios.post(`${API_URL}/users/subjects/`, subjectForm, { headers })
+      setSubjects([...subjects, res.data])
+      setSubjectForm({ name: '', code: '', teacher_id: '' })
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to add subject')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const deleteTeacher = async (id) => {
+    setLoading(true)
+    setError('')
+    try {
+      await axios.delete(`${API_URL}/users/teachers/${id}/`, { headers })
+      setTeachers(teachers.filter((t) => t.id !== id))
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to delete teacher')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const deleteClass = async (id) => {
+    setLoading(true)
+    setError('')
+    try {
+      await axios.delete(`${API_URL}/users/classes/${id}/`, { headers })
+      setClasses(classes.filter((c) => c.id !== id))
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to delete class')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const deleteSubject = async (id) => {
+    setLoading(true)
+    setError('')
+    try {
+      await axios.delete(`${API_URL}/users/subjects/${id}/`, { headers })
+      setSubjects(subjects.filter((s) => s.id !== id))
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to delete subject')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const navItems = [
@@ -95,6 +205,12 @@ export default function Dashboard() {
           <p className="text-gray-600">Manage teachers, classes, and subjects</p>
         </div>
 
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-md text-sm mb-6">
+            {error}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Add Teacher</h2>
@@ -122,15 +238,18 @@ export default function Dashboard() {
               />
               <button
                 onClick={addTeacher}
-                className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 flex items-center justify-center"
+                disabled={loading}
+                className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 flex items-center justify-center disabled:opacity-50"
               >
                 <PlusIcon className="w-5 h-5 mr-2" />
                 Add Teacher
               </button>
             </div>
-            {teachers.length > 0 && (
-              <div className="mt-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Teachers List</h3>
+            <div className="mt-4">
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Teachers List</h3>
+              {teachers.length === 0 ? (
+                <p className="text-sm text-gray-500">No teachers added yet.</p>
+              ) : (
                 <ul className="space-y-2">
                   {teachers.map((t) => (
                     <li key={t.id} className="flex justify-between items-center bg-gray-50 p-2 rounded">
@@ -139,16 +258,17 @@ export default function Dashboard() {
                         <p className="text-sm text-gray-600">{t.email} - {t.subject}</p>
                       </div>
                       <button
-                        onClick={() => setTeachers(teachers.filter((x) => x.id !== t.id))}
-                        className="text-red-600 hover:text-red-800"
+                        onClick={() => deleteTeacher(t.id)}
+                        disabled={loading}
+                        className="text-red-600 hover:text-red-800 disabled:opacity-50"
                       >
                         <TrashIcon className="w-4 h-4" />
                       </button>
                     </li>
                   ))}
                 </ul>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
@@ -177,15 +297,18 @@ export default function Dashboard() {
               />
               <button
                 onClick={addClass}
-                className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 flex items-center justify-center"
+                disabled={loading}
+                className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 flex items-center justify-center disabled:opacity-50"
               >
                 <PlusIcon className="w-5 h-5 mr-2" />
                 Add Class
               </button>
             </div>
-            {classes.length > 0 && (
-              <div className="mt-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Classes List</h3>
+            <div className="mt-4">
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Classes List</h3>
+              {classes.length === 0 ? (
+                <p className="text-sm text-gray-500">No classes added yet.</p>
+              ) : (
                 <ul className="space-y-2">
                   {classes.map((c) => (
                     <li key={c.id} className="flex justify-between items-center bg-gray-50 p-2 rounded">
@@ -194,16 +317,17 @@ export default function Dashboard() {
                         <p className="text-sm text-gray-600">Room: {c.room}</p>
                       </div>
                       <button
-                        onClick={() => setClasses(classes.filter((x) => x.id !== c.id))}
-                        className="text-red-600 hover:text-red-800"
+                        onClick={() => deleteClass(c.id)}
+                        disabled={loading}
+                        className="text-red-600 hover:text-red-800 disabled:opacity-50"
                       >
                         <TrashIcon className="w-4 h-4" />
                       </button>
                     </li>
                   ))}
                 </ul>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           <div className="bg-white rounded-lg shadow p-6 lg:col-span-2">
@@ -223,42 +347,51 @@ export default function Dashboard() {
                 onChange={(e) => setSubjectForm({ ...subjectForm, code: e.target.value })}
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <input
-                type="text"
-                placeholder="Assigned Teacher"
-                value={subjectForm.teacher}
-                onChange={(e) => setSubjectForm({ ...subjectForm, teacher: e.target.value })}
+              <select
+                value={subjectForm.teacher_id}
+                onChange={(e) => setSubjectForm({ ...subjectForm, teacher_id: e.target.value ? Number(e.target.value) : '' })}
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              >
+                <option value="">Select Teacher</option>
+                {teachers.map((t) => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+              </select>
               <button
                 onClick={addSubject}
-                className="bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 flex items-center justify-center"
+                disabled={loading}
+                className="bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 flex items-center justify-center disabled:opacity-50"
               >
                 <PlusIcon className="w-5 h-5 mr-2" />
                 Add Subject
               </button>
             </div>
-            {subjects.length > 0 && (
-              <div className="mt-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Subjects List</h3>
+            <div className="mt-4">
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Subjects List</h3>
+              {subjects.length === 0 ? (
+                <p className="text-sm text-gray-500">No subjects added yet.</p>
+              ) : (
                 <ul className="space-y-2">
                   {subjects.map((s) => (
                     <li key={s.id} className="flex justify-between items-center bg-gray-50 p-2 rounded">
                       <div>
                         <p className="font-medium text-gray-900">{s.name} ({s.code})</p>
-                        <p className="text-sm text-gray-600">Teacher: {s.teacher}</p>
+                        <p className="text-sm text-gray-600">
+                          Teacher: {s.teacher?.name || 'N/A'}
+                        </p>
                       </div>
                       <button
-                        onClick={() => setSubjects(subjects.filter((x) => x.id !== s.id))}
-                        className="text-red-600 hover:text-red-800"
+                        onClick={() => deleteSubject(s.id)}
+                        disabled={loading}
+                        className="text-red-600 hover:text-red-800 disabled:opacity-50"
                       >
                         <TrashIcon className="w-4 h-4" />
                       </button>
                     </li>
                   ))}
                 </ul>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </main>
