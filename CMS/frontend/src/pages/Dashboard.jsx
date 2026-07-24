@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import axios from 'axios'
-import { PlusIcon, TrashIcon, CalendarIcon, UsersIcon, ChartBarIcon, ClipboardDocumentListIcon, CogIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, TrashIcon, CalendarIcon, UsersIcon, ChartBarIcon, ClipboardDocumentListIcon, CogIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
 const API_URL = import.meta.env.VITE_API_URL || '/api'
 
@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [teachers, setTeachers] = useState([])
   const [classes, setClasses] = useState([])
   const [subjects, setSubjects] = useState([])
+  const [pendingUsers, setPendingUsers] = useState([])
 
   const [teacherForm, setTeacherForm] = useState({ name: '', email: '', subject: '' })
   const [classForm, setClassForm] = useState({ name: '', section: '', room: '' })
@@ -52,10 +53,20 @@ export default function Dashboard() {
     }
   }
 
+  const fetchPendingUsers = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/users/pending/`, { headers })
+      setPendingUsers(res.data)
+    } catch (err) {
+      console.error('Failed to fetch pending users', err)
+    }
+  }
+
   useEffect(() => {
     fetchTeachers()
     fetchClasses()
     fetchSubjects()
+    fetchPendingUsers()
   }, [])
 
   const addTeacher = async () => {
@@ -142,10 +153,36 @@ export default function Dashboard() {
     }
   }
 
+  const approveUser = async (id) => {
+    setLoading(true)
+    setError('')
+    try {
+      await axios.post(`${API_URL}/users/users/${id}/approve/`, {}, { headers })
+      setPendingUsers(pendingUsers.filter((u) => u.id !== id))
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to approve user')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const rejectUser = async (id) => {
+    setLoading(true)
+    setError('')
+    try {
+      await axios.post(`${API_URL}/users/users/${id}/reject/`, {}, { headers })
+      setPendingUsers(pendingUsers.filter((u) => u.id !== id))
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to reject user')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const navItems = [
     { path: '/', label: 'Dashboard', icon: ChartBarIcon },
     { path: '/timetable', label: 'Timetable', icon: CalendarIcon },
-    { path: '/students', label: 'Students', icon: UsersIcon, roles: ['TEACHER', 'HOD'] },
+    { path: '/students', label: 'Students', icon: UsersIcon, roles: ['TEACHER', 'HOD', 'ADMIN'] },
     { path: '/reports', label: 'Reports', icon: ClipboardDocumentListIcon, roles: ['HOD', 'ADMIN'] },
     { path: '/settings', label: 'Settings', icon: CogIcon, roles: ['ADMIN'] },
   ]
@@ -160,7 +197,7 @@ export default function Dashboard() {
               <div className="ml-8 flex space-x-4">
                 {navItems.map((item) => {
                   if (item.roles) {
-                    const roleName = user?.role === 1 ? 'TEACHER' : user?.role === 2 ? 'HOD' : 'ADMIN'
+                    const roleName = user?.role === 'teacher' ? 'TEACHER' : user?.role === 'student' ? 'STUDENT' : user?.role === 'admin' ? 'ADMIN' : 'HOD'
                     if (!item.roles.includes(roleName)) return null
                   }
                   return (
@@ -186,7 +223,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-600">
                 {user?.first_name || user?.username} (
-                {user?.role === 1 ? 'Teacher' : user?.role === 2 ? 'HOD' : 'Admin'})
+                {user?.role === 'teacher' ? 'Teacher' : user?.role === 'student' ? 'Student' : user?.role === 'admin' ? 'Admin' : 'HOD'})
               </span>
               <button
                 onClick={logout}
@@ -202,12 +239,44 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Admin Dashboard</h2>
-          <p className="text-gray-600">Manage teachers, classes, and subjects</p>
+          <p className="text-gray-600">Manage teachers, classes, subjects, and user approvals</p>
         </div>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-md text-sm mb-6">
             {error}
+          </div>
+        )}
+
+        {pendingUsers.length > 0 && (
+          <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Pending Approvals</h2>
+            <ul className="space-y-2">
+              {pendingUsers.map((u) => (
+                <li key={u.id} className="flex justify-between items-center bg-gray-50 p-2 rounded">
+                  <div>
+                    <p className="font-medium text-gray-900">{u.first_name} {u.last_name} ({u.username})</p>
+                    <p className="text-sm text-gray-600">{u.email} - {u.role}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => approveUser(u.id)}
+                      disabled={loading}
+                      className="text-green-600 hover:text-green-800 disabled:opacity-50"
+                    >
+                      <CheckIcon className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => rejectUser(u.id)}
+                      disabled={loading}
+                      className="text-red-600 hover:text-red-800 disabled:opacity-50"
+                    >
+                      <XMarkIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 

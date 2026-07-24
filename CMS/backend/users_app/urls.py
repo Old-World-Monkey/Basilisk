@@ -9,8 +9,17 @@ from .views import (
     TeacherDetailView,
     ClassListCreateView,
     ClassDetailView,
+    StudentListCreateView,
+    StudentDetailView,
     SubjectListCreateView,
     SubjectDetailView,
+    AttendanceListCreateView,
+    AttendanceDetailView,
+    MyAttendanceView,
+    TeacherStudentsView,
+    PendingUserListView,
+    ApproveUserView,
+    RejectUserView,
 )
 
 urlpatterns = [
@@ -22,6 +31,15 @@ urlpatterns = [
     path("teachers/<int:pk>/", TeacherDetailView.as_view(), name="teacher-detail"),
     path("classes/", ClassListCreateView.as_view(), name="class-list"),
     path("classes/<int:pk>/", ClassDetailView.as_view(), name="class-detail"),
+    path("students/", StudentListCreateView.as_view(), name="student-list"),
+    path("students/<int:pk>/", StudentDetailView.as_view(), name="student-detail"),
     path("subjects/", SubjectListCreateView.as_view(), name="subject-list"),
     path("subjects/<int:pk>/", SubjectDetailView.as_view(), name="subject-detail"),
+    path("attendance/", AttendanceListCreateView.as_view(), name="attendance-list"),
+    path("attendance/<int:pk>/", AttendanceDetailView.as_view(), name="attendance-detail"),
+    path("my-attendance/", MyAttendanceView.as_view(), name="my-attendance"),
+    path("teacher-students/", TeacherStudentsView.as_view(), name="teacher-students"),
+    path("pending/", PendingUserListView.as_view(), name="pending-users"),
+    path("users/<int:pk>/approve/", ApproveUserView.as_view(), name="approve-user"),
+    path("users/<int:pk>/reject/", RejectUserView.as_view(), name="reject-user"),
 ]

@@ -13,16 +13,22 @@ export default function Login() {
   const from = location.state?.from?.pathname || '/'
 
   useEffect(() => {
+    if (location.state?.registered) {
+      setError('Registration successful. Please wait for admin approval before logging in.')
+    }
+  }, [location.state])
+
+  useEffect(() => {
     if (error) setError('')
   }, [formData])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-    
+
     const result = await login(formData.username, formData.password)
     setLoading(false)
-    
+
     if (result.success) {
       navigate(from, { replace: true })
     } else {
@@ -37,14 +43,14 @@ export default function Login() {
           <h1 className="text-2xl font-bold text-gray-900">BASILISK</h1>
           <p className="text-sm text-gray-600 mt-1">Attendance & Timetable Management</p>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-md text-sm">
               {error}
             </div>
           )}
-          
+
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
               Username
@@ -59,7 +65,7 @@ export default function Login() {
               disabled={loading}
             />
           </div>
-          
+
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Password
@@ -74,7 +80,7 @@ export default function Login() {
               disabled={loading}
             />
           </div>
-          
+
           <button
             type="submit"
             disabled={loading}
@@ -90,6 +96,13 @@ export default function Login() {
             )}
           </button>
         </form>
+
+        <p className="mt-4 text-center text-sm text-gray-600">
+          Don't have an account?{' '}
+          <a href="/register" className="text-blue-600 hover:text-blue-800">
+            Register
+          </a>
+        </p>
       </div>
     </div>
   )
